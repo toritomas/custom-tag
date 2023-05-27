@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+
+<body>
+
+
+	<template id="mc">
+		<style>
+			event-title {
+				display: block;
+				font-size: 2rem;
+			}
+
+			event-desc {
+				display: block;
+				font-size: 1rem;
+			}
+
+			event-visit {
+				display: block;
+				font-size: 3rem;
+			}
+
+			btn-1 {
+				cursor: pointer;
+				display: inline-block;
+				user-select: none;
+				font-weight: bold;
+				padding: 1rem 2rem;
+				background-color: red;
+				color: #fff;
+			}
+
+			btn-1:active {
+				transform: scale(95%);
+			}
+
+			div {
+				display: flex;
+				justify-content: center;
+				gap: 10px;
+			}
+		</style>
+		<event-title>이벤트 타이틀</event-title>
+		<event-desc>이벤트 설명</event-desc>
+		<event-visit></event-visit>
+		<div>
+			<btn-1>Click</btn-1>
+			<btn-1>Click</btn-1>
+		</div>
+	</template>
+
+	<my-counter></my-counter>
+
+	<script type="module">
+		import { proxy, subscribe } from 'https://cdn.jsdelivr.net/npm/valtio@1.10.5/+esm';
+		const state = proxy({ count: 0 });
+		class MyCounter extends HTMLElement {
+			constructor() {
+				super();
+				this.attachShadow({ mode: "open" });
+				const t = document.querySelector('#mc');
+				const c = document.importNode(t.content, true);
+				this.shadowRoot.appendChild(c);
+			}
+			connectedCallback() {
+				const s = this.shadowRoot;
+				const c = s.querySelector('event-visit');
+				const [b1, b2] = s.querySelectorAll('btn-1')
+				subscribe(state, () => {
+					c.innerHTML = state.count;
+					console.log(Math.random())
+				})
+				c.innerHTML = state.count;
+				b1.addEventListener('click', () => state.count++)
+				b2.addEventListener('click', () => state.count--)
+			}
+		}
+		customElements.define('my-counter', MyCounter);
+	</script>
+
+
+</body>
+
+</html>
